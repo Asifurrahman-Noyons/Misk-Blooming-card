@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misk Blooming - Membership Cards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'misk-gold': '#DAA520',
+                        'misk-dark-gold': '#B8860B',
+                        'misk-black': '#1a1a1a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+        
+        .card-3d.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, #DAA520 0%, #FFD700 50%, #B8860B 100%);
+        }
+        
+        .luxury-shadow {
+            box-shadow: 0 20px 40px rgba(218, 165, 32, 0.3), 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(218, 165, 32, 0.3); }
+            to { box-shadow: 0 0 30px rgba(218, 165, 32, 0.6); }
+        }
+        
+        .logo-emboss {
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        
+        .signature-style {
+            font-family: 'Brush Script MT', cursive;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen text-white">
+    <!-- Header -->
+    <header class="bg-black bg-opacity-50 backdrop-blur-sm border-b border-misk-gold/30">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-misk-gold rounded-full flex items-center justify-center logo-emboss">
+                        <span class="text-black font-bold text-xl">M</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-misk-gold" style="font-family: 'Playfair Display', serif;">Misk Blooming</h1>
+                        <p class="text-gray-300 text-sm">Premium Membership Cards</p>
+                    </div>
+                </div>
+                <nav class="flex space-x-6">
+                    <button id="cardTab" class="px-4 py-2 bg-misk-gold text-black rounded-lg font-semibold">Card Creator</button>
+                    <button id="dashboardTab" class="px-4 py-2 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors">Dashboard</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Card Creator Section -->
+    <section id="cardSection" class="container mx-auto px-6 py-8">
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Card Preview -->
+            <div class="space-y-6">
+                <h2 class="text-3xl font-bold text-misk-gold mb-6" style="font-family: 'Playfair Display', serif;">Membership Card Preview</h2>
+                
+                <!-- Card Container -->
+                <div class="perspective-1000">
+                    <div id="membershipCard" class="card-3d relative w-full aspect-[1.6/1] max-w-md mx-auto">
+                        <!-- Front of Card -->
+                        <div class="card-front">
+                            <div id="cardFront" class="w-full h-full gold-gradient luxury-shadow rounded-2xl p-6 shimmer relative overflow-hidden">
+                                <!-- Background Pattern -->
+                                <div class="absolute inset-0 opacity-10">
+                                    <div class="absolute top-4 right-4 w-32 h-32 bg-white rounded-full opacity-20"></div>
+                                    <div class="absolute bottom-4 left-4 w-24 h-24 bg-white rounded-full opacity-15"></div>
+                                </div>
+                                
+                                <!-- Logo -->
+                                <div class="flex justify-between items-start mb-8">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center logo-emboss">
+                                            <span class="text-misk-gold font-bold text-lg">M</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-black font-bold text-lg" style="font-family: 'Playfair Display', serif;">Misk Blooming</h3>
+                                            <p class="text-black text-xs opacity-80">Premium Member</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-black text-xs font-semibold">MEMBER SINCE</p>
+                                        <p class="text-black text-sm" id="memberSince">2024</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Member Name -->
+                                <div class="mb-6">
+                                    <p class="text-black text-sm font-semibold mb-1">MEMBER NAME</p>
+                                    <p class="text-black text-xl font-bold" id="cardMemberName" style="font-family: 'Playfair Display', serif;">John Doe</p>
+                                </div>
+                                
+                                <!-- Card Details -->
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <p class="text-black text-xs font-semibold mb-1">COUPON CODE</p>
+                                        <p class="text-black text-lg font-mono tracking-wider" id="cardCouponCode">MISK2024</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-black text-xs font-semibold mb-1">EXPIRES</p>
+                                        <p class="text-black text-sm font-mono" id="cardExpiry">12/25</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Back of Card -->
+                        <div class="card-back">
+                            <div id="cardBack" class="w-full h-full bg-gradient-to-br from-misk-black to-gray-900 luxury-shadow rounded-2xl p-6 relative overflow-hidden border border-misk-gold/30">
+                                <!-- Magnetic Strip -->
+                                <div class="w-full h-12 bg-black mb-6 rounded"></div>
+                                
+                                <!-- QR Code and Info -->
+                                <div class="flex justify-between items-start mb-6">
+                                    <div>
+                                        <canvas id="qrcode" class="bg-white rounded p-2" width="80" height="80"></canvas>
+                                    </div>
+                                    <div class="text-right flex-1 ml-4">
+                                        <p class="text-misk-gold text-sm font-semibold mb-2">MEMBERSHIP TYPE</p>
+                                        <p class="text-white text-lg" id="cardMembershipType">Premium</p>
+                                        <p class="text-gray-400 text-xs mt-2">Valid until expiry date</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Signature -->
+                                <div class="mb-4">
+                                    <p class="text-misk-gold text-xs font-semibold mb-2">MEMBER SIGNATURE</p>
+                                    <div class="h-8 border-b border-gray-600 relative">
+                                        <p class="signature-style text-white text-lg absolute bottom-0" id="cardSignature">John Doe</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Terms -->
+                                <div class="text-xs text-gray-400 leading-relaxed">
+                                    <p>This card is non-transferable. Terms and conditions apply. Visit miskblooming.com for details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Controls -->
+                <div class="flex justify-center space-x-4 mt-6">
+                    <button id="flipCard" class="px-6 py-3 bg-misk-gold text-black rounded-lg font-semibold hover:bg-misk-dark-gold transition-colors">
+                        Flip Card
+                    </button>
+                    <button id="downloadCard" class="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                        Download PNG
+                    </button>
+                    <button id="printCard" class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Print Card
+                    </button>
+                    <button id="shareWhatsApp" class="px-6 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                        Share WhatsApp
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Form -->
+            <div class="space-y-6">
+                <h2 class="text-3xl font-bold text-misk-gold mb-6" style="font-family: 'Playfair Display', serif;">Member Information</h2>
+                
+                <form id="memberForm" class="space-y-6">
+                    <!-- Member Name -->
+                    <div>
+                        <label class="block text-white font-semibold mb-2">Member Name</label>
+                        <input type="text" id="memberName" value="John Doe" 
+                               class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none focus:ring-2 focus:ring-misk-gold/50">
+                    </div>
+                    
+                    <!-- Coupon Code -->
+                    <div class="flex space-x-4">
+                        <div class="flex-1">
+                            <label class="block text-white font-semibold mb-2">Coupon Code</label>
+                            <input type="text" id="couponCode" value="MISK2024"
+                                   class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none focus:ring-2 focus:ring-misk-gold/50">
+                        </div>
+                        <div>
+                            <label class="block text-white font-semibold mb-2">&nbsp;</label>
+                            <button type="button" id="generateCode" 
+                                    class="px-6 py-3 bg-misk-gold text-black rounded-lg font-semibold hover:bg-misk-dark-gold transition-colors">
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Expiry Date -->
+                    <div>
+                        <label class="block text-white font-semibold mb-2">Expiry Date</label>
+                        <input type="month" id="expiryDate" value="2025-12"
+                               class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none focus:ring-2 focus:ring-misk-gold/50">
+                    </div>
+                    
+                    <!-- Membership Type -->
+                    <div>
+                        <label class="block text-white font-semibold mb-2">Membership Type</label>
+                        <select id="membershipType"
+                                class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none focus:ring-2 focus:ring-misk-gold/50">
+                            <option value="Premium">Premium</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Platinum">Platinum</option>
+                            <option value="VIP">VIP</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="space-y-4">
+                        <button type="button" id="saveMember" 
+                                class="w-full px-6 py-4 bg-misk-gold text-black rounded-lg font-bold text-lg hover:bg-misk-dark-gold transition-colors pulse-glow">
+                            Save Member Card
+                        </button>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <button type="button" id="clearForm" 
+                                    class="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                                Clear Form
+                            </button>
+                            <button type="button" id="cancelMember" 
+                                    class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                                Cancel Member
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboardSection" class="container mx-auto px-6 py-8 hidden">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-misk-gold mb-4" style="font-family: 'Playfair Display', serif;">Membership Dashboard</h2>
+            
+            <!-- Dashboard Stats -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-800 rounded-lg p-6 border border-misk-gold/30">
+                    <h3 class="text-misk-gold font-semibold mb-2">Total Members</h3>
+                    <p class="text-3xl font-bold text-white" id="totalMembers">0</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6 border border-green-500/30">
+                    <h3 class="text-green-500 font-semibold mb-2">Active Members</h3>
+                    <p class="text-3xl font-bold text-white" id="activeMembers">0</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6 border border-yellow-500/30">
+                    <h3 class="text-yellow-500 font-semibold mb-2">Expiring Soon</h3>
+                    <p class="text-3xl font-bold text-white" id="expiringSoon">0</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6 border border-red-500/30">
+                    <h3 class="text-red-500 font-semibold mb-2">Expired/Cancelled</h3>
+                    <p class="text-3xl font-bold text-white" id="expiredMembers">0</p>
+                </div>
+            </div>
+            
+            <!-- Search and Filters -->
+            <div class="flex flex-wrap gap-4 mb-6">
+                <input type="text" id="searchMembers" placeholder="Search by name or coupon code..."
+                       class="flex-1 min-w-64 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none focus:ring-2 focus:ring-misk-gold/50">
+                
+                <select id="filterStatus"
+                        class="px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="expiring">Expiring Soon</option>
+                    <option value="expired">Expired</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                
+                <button id="exportCSV" 
+                        class="px-6 py-3 bg-misk-gold text-black rounded-lg font-semibold hover:bg-misk-dark-gold transition-colors">
+                    Export CSV
+                </button>
+                
+                <button id="bulkCreate" 
+                        class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                    Bulk Create
+                </button>
+            </div>
+        </div>
+        
+        <!-- Members Table -->
+        <div class="bg-gray-800 rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-misk-gold text-black">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold">Member Name</th>
+                            <th class="px-6 py-4 text-left font-semibold">Coupon Code</th>
+                            <th class="px-6 py-4 text-left font-semibold">Type</th>
+                            <th class="px-6 py-4 text-left font-semibold">Expiry</th>
+                            <th class="px-6 py-4 text-left font-semibold">Status</th>
+                            <th class="px-6 py-4 text-left font-semibold">Created</th>
+                            <th class="px-6 py-4 text-center font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTable" class="text-white">
+                        <!-- Members will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bulk Create Modal -->
+    <div id="bulkModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-misk-gold mb-4">Bulk Create Members</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white font-semibold mb-2">Number of Cards</label>
+                    <input type="number" id="bulkCount" min="1" max="50" value="5"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-white font-semibold mb-2">Membership Type</label>
+                    <select id="bulkType"
+                            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none">
+                        <option value="Premium">Premium</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Platinum">Platinum</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-white font-semibold mb-2">Expiry Date</label>
+                    <input type="month" id="bulkExpiry"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-misk-gold focus:outline-none">
+                </div>
+                <div class="flex space-x-4 pt-4">
+                    <button id="createBulkCards" 
+                            class="flex-1 px-6 py-3 bg-misk-gold text-black rounded-lg font-semibold hover:bg-misk-dark-gold transition-colors">
+                        Create Cards
+                    </button>
+                    <button id="closeBulkModal" 
+                            class="flex-1 px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Membership Management System
+        class MembershipSystem {
+            constructor() {
+                this.members = this.loadMembers();
+                this.currentMember = null;
+                this.isCardFlipped = false;
+                this.initializeEventListeners();
+                this.updateCardDisplay();
+                this.updateDashboard();
+                this.generateQRCode('MISK2024');
+            }
+
+            // Local Storage Management
+            loadMembers() {
+                const stored = localStorage.getItem('miskMembers');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            saveMembers() {
+                localStorage.setItem('miskMembers', JSON.stringify(this.members));
+                this.updateDashboard();
+            }
+
+            // Generate unique coupon code
+            generateCouponCode() {
+                const prefix = 'MISK';
+                const timestamp = Date.now().toString(36).toUpperCase();
+                const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+                return `${prefix}${timestamp}${random}`;
+            }
+
+            // QR Code generation
+            generateQRCode(text) {
+                const canvas = document.getElementById('qrcode');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                QRCode.toCanvas(canvas, text, {
+                    width: 80,
+                    margin: 1,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                });
+            }
+
+            // Update card display
+            updateCardDisplay() {
+                const memberName = document.getElementById('memberName').value;
+                const couponCode = document.getElementById('couponCode').value;
+                const expiryDate = document.getElementById('expiryDate').value;
+                const membershipType = document.getElementById('membershipType').value;
+
+                // Update front card
+                document.getElementById('cardMemberName').textContent = memberName || 'Member Name';
+                document.getElementById('cardCouponCode').textContent = couponCode || 'COUPON';
+                document.getElementById('cardExpiry').textContent = expiryDate ? 
+                    new Date(expiryDate).toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }) : 'MM/YY';
+                
+                // Update back card
+                document.getElementById('cardMembershipType').textContent = membershipType;
+                document.getElementById('cardSignature').textContent = memberName || 'Member Name';
+
+                // Update QR code
+                this.generateQRCode(couponCode || 'MISK');
+            }
+
+            // Get member status
+            getMemberStatus(member) {
+                if (member.cancelled) return 'cancelled';
+                
+                const now = new Date();
+                const expiry = new Date(member.expiryDate);
+                const oneMonth = 30 * 24 * 60 * 60 * 1000;
+                
+                if (expiry < now) return 'expired';
+                if (expiry - now < oneMonth) return 'expiring';
+                return 'active';
+            }
+
+            // Save member
+            saveMember() {
+                const memberData = {
+                    id: this.currentMember?.id || Date.now().toString(),
+                    name: document.getElementById('memberName').value,
+                    couponCode: document.getElementById('couponCode').value,
+                    expiryDate: document.getElementById('expiryDate').value,
+                    membershipType: document.getElementById('membershipType').value,
+                    createdDate: this.currentMember?.createdDate || new Date().toISOString(),
+                    cancelled: false
+                };
+
+                if (!memberData.name || !memberData.couponCode || !memberData.expiryDate) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                // Check for duplicate coupon codes
+                const existingMember = this.members.find(m => 
+                    m.couponCode === memberData.couponCode && m.id !== memberData.id);
+                
+                if (existingMember) {
+                    alert('Coupon code already exists. Please use a different code.');
+                    return;
+                }
+
+                if (this.currentMember) {
+                    // Update existing member
+                    const index = this.members.findIndex(m => m.id === this.currentMember.id);
+                    this.members[index] = memberData;
+                } else {
+                    // Add new member
+                    this.members.push(memberData);
+                }
+
+                this.currentMember = memberData;
+                this.saveMembers();
+                alert('Member saved successfully!');
+            }
+
+            // Load member for editing
+            loadMember(id) {
+                const member = this.members.find(m => m.id === id);
+                if (member) {
+                    this.currentMember = member;
+                    document.getElementById('memberName').value = member.name;
+                    document.getElementById('couponCode').value = member.couponCode;
+                    document.getElementById('expiryDate').value = member.expiryDate;
+                    document.getElementById('membershipType').value = member.membershipType;
+                    this.updateCardDisplay();
+                    
+                    // Switch to card tab
+                    this.switchTab('card');
+                }
+            }
+
+            // Delete member
+            deleteMember(id) {
+                if (confirm('Are you sure you want to delete this member?')) {
+                    this.members = this.members.filter(m => m.id !== id);
+                    this.saveMembers();
+                }
+            }
+
+            // Cancel member
+            cancelMember(id = null) {
+                const memberId = id || this.currentMember?.id;
+                if (!memberId) {
+                    alert('No member selected to cancel');
+                    return;
+                }
+
+                if (confirm('Are you sure you want to cancel this membership?')) {
+                    const member = this.members.find(m => m.id === memberId);
+                    if (member) {
+                        member.cancelled = true;
+                        this.saveMembers();
+                        if (!id) alert('Membership cancelled successfully');
+                    }
+                }
+            }
+
+            // Clear form
+            clearForm() {
+                document.getElementById('memberName').value = '';
+                document.getElementById('couponCode').value = '';
+                document.getElementById('expiryDate').value = '';
+                document.getElementById('membershipType').value = 'Premium';
+                this.currentMember = null;
+                this.updateCardDisplay();
+            }
+
+            // Download card as image
+            async downloadCard() {
+                const card = this.isCardFlipped ? 
+                    document.getElementById('cardBack') : 
+                    document.getElementById('cardFront');
+                
+                try {
+                    const canvas = await html2canvas(card, {
+                        backgroundColor: null,
+                        scale: 2,
+                        logging: false
+                    });
+                    
+                    const link = document.createElement('a');
+                    link.download = `misk-membership-${document.getElementById('couponCode').value || 'card'}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                } catch (error) {
+                    alert('Error generating card image. Please try again.');
+                }
+            }
+
+            // Print card
+            printCard() {
+                const memberName = document.getElementById('memberName').value;
+                const couponCode = document.getElementById('couponCode').value;
+                const expiryDate = document.getElementById('expiryDate').value;
+                const membershipType = document.getElementById('membershipType').value;
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Misk Blooming Membership Card - ${memberName}</title>
+                            <style>
+                                @page { size: auto; margin: 0.5in; }
+                                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                                .card-container { display: flex; gap: 20px; justify-content: center; }
+                                .card { width: 340px; height: 214px; border-radius: 16px; padding: 24px; box-sizing: border-box; }
+                                .card-front { background: linear-gradient(135deg, #DAA520 0%, #FFD700 50%, #B8860B 100%); color: black; }
+                                .card-back { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); color: white; border: 1px solid #DAA520; }
+                                .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+                                .logo-icon { width: 40px; height: 40px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #DAA520; font-weight: bold; font-size: 18px; }
+                                .logo-text { font-size: 18px; font-weight: bold; }
+                                .member-name { font-size: 20px; font-weight: bold; margin-bottom: 24px; }
+                                .card-details { display: flex; justify-content: space-between; align-items: end; }
+                                .magnetic-strip { width: 100%; height: 48px; background: black; margin-bottom: 24px; border-radius: 4px; }
+                                .qr-section { display: flex; gap: 16px; align-items: flex-start; }
+                                .qr-code { width: 80px; height: 80px; background: white; padding: 8px; border-radius: 4px; }
+                                .signature-area { margin-top: 16px; padding-top: 8px; border-bottom: 1px solid #666; }
+                                .terms { font-size: 10px; color: #999; margin-top: 16px; line-height: 1.4; }
+                                @media print { .no-print { display: none; } }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="card-container">
+                                <div class="card card-front">
+                                    <div class="logo">
+                                        <div class="logo-icon">M</div>
+                                        <div>
+                                            <div class="logo-text">Misk Blooming</div>
+                                            <div style="font-size: 12px; opacity: 0.8;">Premium Member</div>
+                                        </div>
+                                    </div>
+                                    <div class="member-name">${memberName}</div>
+                                    <div class="card-details">
+                                        <div>
+                                            <div style="font-size: 12px; font-weight: bold; margin-bottom: 4px;">COUPON CODE</div>
+                                            <div style="font-size: 18px; font-family: monospace; letter-spacing: 2px;">${couponCode}</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-size: 12px; font-weight: bold; margin-bottom: 4px;">EXPIRES</div>
+                                            <div style="font-size: 14px; font-family: monospace;">${expiryDate ? new Date(expiryDate).toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' }) : 'MM/YY'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card card-back">
+                                    <div class="magnetic-strip"></div>
+                                    <div class="qr-section">
+                                        <div class="qr-code">QR CODE</div>
+                                        <div style="flex: 1;">
+                                            <div style="color: #DAA520; font-size: 14px; font-weight: bold; margin-bottom: 8px;">MEMBERSHIP TYPE</div>
+                                            <div style="font-size: 18px;">${membershipType}</div>
+                                            <div style="font-size: 12px; color: #999; margin-top: 8px;">Valid until expiry date</div>
+                                        </div>
+                                    </div>
+                                    <div class="signature-area">
+                                        <div style="color: #DAA520; font-size: 12px; font-weight: bold; margin-bottom: 8px;">MEMBER SIGNATURE</div>
+                                        <div style="font-style: italic; font-size: 18px;">${memberName}</div>
+                                    </div>
+                                    <div class="terms">
+                                        This card is non-transferable. Terms and conditions apply. Visit miskblooming.com for details.
+                                    </div>
+                                </div>
+                            </div>
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            }
+
+            // Share via WhatsApp
+            shareWhatsApp() {
+                const memberName = document.getElementById('memberName').value;
+                const couponCode = document.getElementById('couponCode').value;
+                const expiryDate = document.getElementById('expiryDate').value;
+                const membershipType = document.getElementById('membershipType').value;
+
+                const message = `🎉 Welcome to Misk Blooming Premium Membership!
+
+👤 Member: ${memberName}
+🎫 Coupon Code: ${couponCode}
+🏆 Type: ${membershipType}
+📅 Valid until: ${expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A'}
+
+Enjoy exclusive benefits and discounts at Misk Blooming! 🍫✨
+
+Visit us at miskblooming.com`;
+
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            }
+
+            // Bulk create members
+            createBulkMembers() {
+                const count = parseInt(document.getElementById('bulkCount').value);
+                const type = document.getElementById('bulkType').value;
+                const expiry = document.getElementById('bulkExpiry').value;
+
+                if (!expiry) {
+                    alert('Please select an expiry date');
+                    return;
+                }
+
+                const newMembers = [];
+                for (let i = 1; i <= count; i++) {
+                    const member = {
+                        id: Date.now().toString() + i,
+                        name: `Member ${String(i).padStart(3, '0')}`,
+                        couponCode: this.generateCouponCode(),
+                        expiryDate: expiry,
+                        membershipType: type,
+                        createdDate: new Date().toISOString(),
+                        cancelled: false
+                    };
+                    newMembers.push(member);
+                }
+
+                this.members.push(...newMembers);
+                this.saveMembers();
+                this.closeBulkModal();
+                alert(`${count} members created successfully!`);
+            }
+
+            // Export to CSV
+            exportCSV() {
+                if (this.members.length === 0) {
+                    alert('No members to export');
+                    return;
+                }
+
+                const headers = ['Name', 'Coupon Code', 'Membership Type', 'Expiry Date', 'Status', 'Created Date'];
+                const csvData = this.members.map(member => [
+                    member.name,
+                    member.couponCode,
+                    member.membershipType,
+                    member.expiryDate,
+                    this.getMemberStatus(member),
+                    new Date(member.createdDate).toLocaleDateString()
+                ]);
+
+                const csv = [headers, ...csvData]
+                    .map(row => row.map(field => `"${field}"`).join(','))
+                    .join('\n');
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `misk-members-${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+
+            // Update dashboard
+            updateDashboard() {
+                const now = new Date();
+                const oneMonth = 30 * 24 * 60 * 60 * 1000;
+
+                const stats = {
+                    total: this.members.length,
+                    active: 0,
+                    expiring: 0,
+                    expired: 0
+                };
+
+                this.members.forEach(member => {
+                    const status = this.getMemberStatus(member);
+                    if (status === 'active') stats.active++;
+                    else if (status === 'expiring') stats.expiring++;
+                    else if (status === 'expired' || status === 'cancelled') stats.expired++;
+                });
+
+                document.getElementById('totalMembers').textContent = stats.total;
+                document.getElementById('activeMembers').textContent = stats.active;
+                document.getElementById('expiringSoon').textContent = stats.expiring;
+                document.getElementById('expiredMembers').textContent = stats.expired;
+
+                this.renderMembersTable();
+            }
+
+            // Render members table
+            renderMembersTable() {
+                const tbody = document.getElementById('membersTable');
+                const searchTerm = document.getElementById('searchMembers').value.toLowerCase();
+                const statusFilter = document.getElementById('filterStatus').value;
+
+                let filteredMembers = this.members.filter(member => {
+                    const matchesSearch = !searchTerm || 
+                        member.name.toLowerCase().includes(searchTerm) || 
+                        member.couponCode.toLowerCase().includes(searchTerm);
+                    
+                    const memberStatus = this.getMemberStatus(member);
+                    const matchesFilter = !statusFilter || memberStatus === statusFilter;
+
+                    return matchesSearch && matchesFilter;
+                });
+
+                tbody.innerHTML = filteredMembers.map(member => {
+                    const status = this.getMemberStatus(member);
+                    const statusColors = {
+                        active: 'text-green-500',
+                        expiring: 'text-yellow-500',
+                        expired: 'text-red-500',
+                        cancelled: 'text-gray-500'
+                    };
+
+                    return `
+                        <tr class="border-b border-gray-700 hover:bg-gray-700 transition-colors">
+                            <td class="px-6 py-4 font-semibold">${member.name}</td>
+                            <td class="px-6 py-4 font-mono">${member.couponCode}</td>
+                            <td class="px-6 py-4">${member.membershipType}</td>
+                            <td class="px-6 py-4">${new Date(member.expiryDate).toLocaleDateString()}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded text-xs font-semibold ${statusColors[status]} bg-opacity-20 bg-current">
+                                    ${status.charAt(0).toUpperCase() + status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">${new Date(member.createdDate).toLocaleDateString()}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex space-x-2 justify-center">
+                                    <button onclick="membershipSystem.loadMember('${member.id}')" 
+                                            class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors">
+                                        Edit
+                                    </button>
+                                    ${status !== 'cancelled' ? 
+                                        `<button onclick="membershipSystem.cancelMember('${member.id}')" 
+                                                 class="px-3 py-1 bg-yellow-600 text-white rounded text-xs hover:bg-yellow-700 transition-colors">
+                                            Cancel
+                                        </button>` : ''
+                                    }
+                                    <button onclick="membershipSystem.deleteMember('${member.id}')" 
+                                            class="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Switch between tabs
+            switchTab(tab) {
+                const cardSection = document.getElementById('cardSection');
+                const dashboardSection = document.getElementById('dashboardSection');
+                const cardTab = document.getElementById('cardTab');
+                const dashboardTab = document.getElementById('dashboardTab');
+
+                if (tab === 'card') {
+                    cardSection.classList.remove('hidden');
+                    dashboardSection.classList.add('hidden');
+                    cardTab.classList.add('bg-misk-gold', 'text-black');
+                    cardTab.classList.remove('bg-gray-700', 'text-white');
+                    dashboardTab.classList.add('bg-gray-700', 'text-white');
+                    dashboardTab.classList.remove('bg-misk-gold', 'text-black');
+                } else {
+                    cardSection.classList.add('hidden');
+                    dashboardSection.classList.remove('hidden');
+                    dashboardTab.classList.add('bg-misk-gold', 'text-black');
+                    dashboardTab.classList.remove('bg-gray-700', 'text-white');
+                    cardTab.classList.add('bg-gray-700', 'text-white');
+                    cardTab.classList.remove('bg-misk-gold', 'text-black');
+                }
+            }
+
+            // Flip card animation
+            flipCard() {
+                const card = document.getElementById('membershipCard');
+                this.isCardFlipped = !this.isCardFlipped;
+                card.classList.toggle('flipped');
+            }
+
+            // Show/hide bulk modal
+            showBulkModal() {
+                document.getElementById('bulkModal').classList.remove('hidden');
+                // Set default expiry to next year
+                const nextYear = new Date();
+                nextYear.setFullYear(nextYear.getFullYear() + 1);
+                document.getElementById('bulkExpiry').value = nextYear.toISOString().substr(0, 7);
+            }
+
+            closeBulkModal() {
+                document.getElementById('bulkModal').classList.add('hidden');
+            }
+
+            // Initialize all event listeners
+            initializeEventListeners() {
+                // Form inputs - real-time updates
+                ['memberName', 'couponCode', 'expiryDate', 'membershipType'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => this.updateCardDisplay());
+                });
+
+                // Generate coupon code
+                document.getElementById('generateCode').addEventListener('click', () => {
+                    document.getElementById('couponCode').value = this.generateCouponCode();
+                    this.updateCardDisplay();
+                });
+
+                // Card actions
+                document.getElementById('flipCard').addEventListener('click', () => this.flipCard());
+                document.getElementById('downloadCard').addEventListener('click', () => this.downloadCard());
+                document.getElementById('printCard').addEventListener('click', () => this.printCard());
+                document.getElementById('shareWhatsApp').addEventListener('click', () => this.shareWhatsApp());
+
+                // Form actions
+                document.getElementById('saveMember').addEventListener('click', () => this.saveMember());
+                document.getElementById('clearForm').addEventListener('click', () => this.clearForm());
+                document.getElementById('cancelMember').addEventListener('click', () => this.cancelMember());
+
+                // Tab switching
+                document.getElementById('cardTab').addEventListener('click', () => this.switchTab('card'));
+                document.getElementById('dashboardTab').addEventListener('click', () => this.switchTab('dashboard'));
+
+                // Dashboard controls
+                document.getElementById('searchMembers').addEventListener('input', () => this.renderMembersTable());
+                document.getElementById('filterStatus').addEventListener('change', () => this.renderMembersTable());
+                document.getElementById('exportCSV').addEventListener('click', () => this.exportCSV());
+                document.getElementById('bulkCreate').addEventListener('click', () => this.showBulkModal());
+
+                // Bulk modal
+                document.getElementById('createBulkCards').addEventListener('click', () => this.createBulkMembers());
+                document.getElementById('closeBulkModal').addEventListener('click', () => this.closeBulkModal());
+
+                // Close modal when clicking outside
+                document.getElementById('bulkModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'bulkModal') this.closeBulkModal();
+                });
+
+                // Set member since date
+                document.getElementById('memberSince').textContent = new Date().getFullYear();
+            }
+        }
+
+        // Initialize the system when page loads
+        let membershipSystem;
+        document.addEventListener('DOMContentLoaded', () => {
+            membershipSystem = new MembershipSystem();
+        });
+    </script>
+</body>
+</html>
